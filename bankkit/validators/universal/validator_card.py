@@ -64,6 +64,11 @@ def _luhn_check(number: str) -> bool:
 # Card brand rules based on IIN/BIN ranges (ISO 7812)
 # Each entry: (pattern, brand, card_lengths)
 _CARD_BRANDS = [
+
+    # Elo — Brazilian card network (BIN ranges)
+    # Elo FIRST — before Visa, because some Elo BINs start with 4
+    (r"^(4011|4312|4389|4514|4576|5041|5066|5090|6277|6362|6363|650[0-9]|6516|6550)", "Elo", [16]),
+
     # Visa — starts with 4
     (r"^4",                         "Visa",             [13, 16, 19]),
 
@@ -74,8 +79,6 @@ _CARD_BRANDS = [
     # American Express — starts with 34 or 37
     (r"^3[47]",                     "Amex",             [15]),
 
-    # Elo — Brazilian card network (BIN ranges)
-    (r"^(4011|4312|4389|4514|4576|5041|5066|5090|6277|6362|6363|650[0-9]|6516|6550)", "Elo", [16]),
 
     # Hipercard — Brazilian card network
     (r"^(606282|637095|637568|637599|637609|637612)", "Hipercard", [13, 16, 19]),

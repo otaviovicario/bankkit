@@ -3,7 +3,7 @@
 # Run with: pytest tests/
 
 import pytest
-from bankkit.validators.latam.br import (
+from bankkit.validators.latam.validator_br import (
     validate_cpf,
     validate_cnpj,
     validate_pix,

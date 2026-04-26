@@ -1,8 +1,8 @@
 # cores/universal/core_card.py
 # BankKit card methods
-# Delegates to validators/universal/card.py
+# Delegates to validator_card.py
 
-from bankkit.validators.universal.card import validate_card, validate_bin
+from bankkit.validators.universal.validator_card import validate_card, validate_bin
 
 
 class BankKitCard:

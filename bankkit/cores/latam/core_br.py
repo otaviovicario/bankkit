@@ -1,8 +1,8 @@
 # cores/latam/core_br.py
 # BankKit Brazilian methods
-# Delegates to validators/latam/br.py
+# Delegates to validator_br.py
 
-from bankkit.validators.latam.br import (
+from bankkit.validators.latam.validator_br import (
     validate_cpf,
     validate_cnpj,
     validate_pix,

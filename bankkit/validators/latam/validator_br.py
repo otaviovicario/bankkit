@@ -233,7 +233,7 @@ def validate_br_account(agency: str, account: str, code: str = None) -> dict:
     # If a bank code is provided, look it up
     bank_name = None
     if code:
-        from bankkit.data.latam.br import BANKS
+        from bankkit.data.latam.data_br import BANKS
         bank = BANKS.get(code.strip())
         if bank:
             bank_name = bank.get("name")

@@ -3,7 +3,7 @@
 # Run with: pytest tests/
 
 import pytest
-from bankkit.validators.universal.card import validate_card, validate_bin
+from bankkit.validators.universal.validator_card import validate_card, validate_bin
 
 
 # ---------------------------------------------------------------------------
