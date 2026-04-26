@@ -1,18 +1,15 @@
 from bankkit.core import BankKit
 
-bank = BankKit()
+bk = BankKit()
 
-print("--- Testando API do BankKit ---\n")
+# CPF
+print(bk.validate_cpf("111.444.777-35"))
 
-print("Buscar banco por nome:")
-print(bank.bank("itau"))
+# CNPJ
+print(bk.validate_cnpj("11.222.333/0001-81"))
 
-print("Buscar banco por código:")
-print(bank.code("341"))
+# PIX
+print(bk.validate_pix("user@email.com"))
 
-print("Buscar SWIFT por nome:")
-print(bank.swift("itau"))
-
-print("Validar conta:")
-print(bank.validate_account("BR", "0001", "567890"))
-
+# Conta BR
+print(bk.validate_br_account("0001", "123456", code="341"))

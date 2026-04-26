@@ -1,63 +1,105 @@
-from .data import BANKS
-from .validators import validate_br_account
+# bankkit/core.py
+# Main entry point for BankKit SDK
+# All public methods are defined here and delegate to the appropriate validators
+
+from .validators.latam.br import (
+    validate_cpf,
+    validate_cnpj,
+    validate_pix,
+    validate_br_account,
+)
 
 
 class BankKit:
-    def __init__(self):
-        self.banks = BANKS
+    """
+    BankKit — Python SDK for validating banking data.
+    Built for Latin America, ready for the world.
 
-    # -------------------------
-    # API PUBLICA
-    # -------------------------
-    def bank(self, name: str, country: str = None):
-        bank = self.banks.get(name.lower())
+    Usage:
+        from bankkit import BankKit
 
-        if not bank:
-            return self._response(error=f"Bank '{name}' not found")
+        bk = BankKit()
+        bk.validate_cpf("111.444.777-35")
+        bk.validate_pix("user@email.com")
+    """
 
-        if country and bank.get("country") != country:
-            return self._response(error=f"Bank '{name}' not found in {country}")
+    # -------------------------------------------------------------------------
+    # BRAZIL
+    # -------------------------------------------------------------------------
 
-        return self._response(data=bank)
+    def validate_cpf(self, cpf: str) -> dict:
+        """
+        Validates a Brazilian CPF number.
 
-    def code(self, code: str, country: str = None):
-        for bank in self.banks.values():
-            if bank.get("code") == code:
-                if country and bank.get("country") != country:
-                    continue
-                return self._response(data=bank)
+        Args:
+            cpf: CPF string — accepts "111.444.777-35" or "11144477735"
 
-        return self._response(error=f"Bank code '{code}' not found")
+        Returns:
+            dict: {"valid": bool, "error": str | None}
 
-    def swift(self, name: str):
-        bank = self.banks.get(name.lower())
+        Example:
+            >>> bk.validate_cpf("111.444.777-35")
+            {"valid": True, "error": None}
+        """
+        return validate_cpf(cpf)
 
-        if not bank:
-            return self._response(error=f"Bank '{name}' not found")
+    def validate_cnpj(self, cnpj: str) -> dict:
+        """
+        Validates a Brazilian CNPJ number.
 
-        return self._response(data=bank.get("swift"))
+        Args:
+            cnpj: CNPJ string — accepts "11.222.333/0001-81" or "11222333000181"
 
-    def validate_account(self, country: str, agency: str, account: str):
-        if country.upper() == "BR":
-            return self._wrap_validate(validate_br_account(agency, account))
+        Returns:
+            dict: {"valid": bool, "error": str | None}
 
-        return self._response(
-            error=f"Account validation for country '{country}' is not supported."
-        )
+        Example:
+            >>> bk.validate_cnpj("11.222.333/0001-81")
+            {"valid": True, "error": None}
+        """
+        return validate_cnpj(cnpj)
 
-    # -------------------------
-    # helpers
-    # -------------------------
-    def _response(self, data=None, error=None):
-        return {
-            "success": error is None,
-            "data": data,
-            "error": error
-        }
+    def validate_pix(self, key: str) -> dict:
+        """
+        Validates a Brazilian PIX key and identifies its type.
 
-    def _wrap_validate(self, result: dict):
-        return {
-            "success": result.get("valid", False),
-            "data": None,
-            "error": None if result.get("valid") else result.get("reason")
-        }
+        Args:
+            key: PIX key — CPF, CNPJ, email, phone (+55), or random UUID
+
+        Returns:
+            dict: {"valid": bool, "type": str, "error": str | None}
+
+        Example:
+            >>> bk.validate_pix("user@email.com")
+            {"valid": True, "type": "EMAIL", "error": None}
+        """
+        return validate_pix(key)
+
+    def validate_br_account(self, agency: str, account: str, code: str = None) -> dict:
+        """
+        Validates a Brazilian bank account (agency + account number).
+
+        Args:
+            agency:  Agency number — must be exactly 4 digits
+            account: Account number — must be between 5 and 12 digits
+            code:    Optional COMPE bank code (e.g. "077" for Banco Inter)
+
+        Returns:
+            dict: {"valid": bool, "bank": str | None, "error": str | None}
+
+        Example:
+            >>> bk.validate_br_account("0001", "123456", code="341")
+            {"valid": True, "bank": "Itaú Unibanco", "error": None}
+        """
+        return validate_br_account(agency, account, code)
+
+    # -------------------------------------------------------------------------
+    # COMING SOON
+    # -------------------------------------------------------------------------
+    # validate_iban()       — ISO 13616
+    # validate_swift()      — ISO 9362
+    # validate_card()       — ISO 7812 + Luhn
+    # validate_bin()        — BIN lookup
+    # validate_clabe()      — Mexico BANXICO
+    # validate_cbu()        — Argentina BCRA
+    # validate_routing()    — US ABA
