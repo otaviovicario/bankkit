@@ -1,0 +1,7 @@
+-e git+https://github.com/otaviovicario/bankkit.git@b2cb624d587dac4091a6bbef0c693eee85d94a5f#egg=bankkit
+colorama==0.4.6
+iniconfig==2.3.0
+packaging==26.2
+pluggy==1.6.0
+Pygments==2.20.0
+pytest==9.0.3
