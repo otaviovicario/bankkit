@@ -7,10 +7,11 @@ from bankkit.cores.universal.core_card import BankKitCard
 from bankkit.cores.universal.core_swift import BankKitSWIFT
 from bankkit.cores.europe.core_iban import BankKitIBAN
 from bankkit.cores.latam.core_ar import BankKitAR
+from bankkit.cores.northamerica.core_us import BankKitUS
 
 
 
-class BankKit(BankKitBR, BankKitCard, BankKitIBAN, BankKitSWIFT, BankKitAR):
+class BankKit(BankKitBR, BankKitCard, BankKitIBAN, BankKitSWIFT, BankKitAR, BankKitUS):
     """
     BankKit — Python SDK for validating banking data.
     Built for Latin America, ready for the world.
