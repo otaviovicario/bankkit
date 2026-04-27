@@ -2,7 +2,7 @@
 # BankKit US methods
 # Delegates to validators/northamerica/validator_us.py
 
-from bankkit.cores.northamerica.core_us import validate_routing
+from bankkit.validators.northamerica.validator_us import validate_routing
 
 
 class BankKitUS:
