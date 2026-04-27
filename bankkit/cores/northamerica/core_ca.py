@@ -26,6 +26,8 @@ def _response(valid: bool, error: str = None, **extra) -> dict:
 # CANADIAN INSTITUTION NUMBERS
 # ---------------------------------------------------------------------------
 
+# Major Canadian bank institution numbers
+# Source: Payments Canada — https://www.payments.ca
 _INSTITUTIONS = {
     "001": "Bank of Montreal (BMO)",
     "002": "Scotiabank",
@@ -58,45 +60,47 @@ def validate_ca_routing(routing: str) -> dict:
     """
     Validates a Canadian routing number (transit + institution).
 
-    Structure:
-        Paper format     (9 digits): 0 TTTTT III
-        Electronic format (8 digits):  TTTTT III
+    Structure (8 digits):
+        TTTTT III
+        ^^^^^ ^^^
+        |     institution number (3 digits) — identifies the bank
+        transit number (5 digits) — identifies the branch
 
-        TTTTT = transit number (5 digits) — identifies the branch
-        III   = institution number (3 digits) — identifies the bank
+    Note:
+        Canadian routing numbers have no check digit algorithm.
+        Validation is based on format and institution number recognition.
 
     Args:
-        routing: Routing string — 8 or 9 digits
-                 e.g. "000110011" (paper) or "00011001" (electronic)
+        routing: Routing string — accepts formats like "000110011" or "00011-001"
+                 Can be 8 digits (TTTTTIII) or 9 digits with leading zero
 
     Returns:
         dict: {
             "valid":       bool,
-            "bank":        str | None,
-            "institution": str,
-            "transit":     str,
+            "bank":        str | None,   # bank name if institution recognized
+            "institution": str,          # 3-digit institution code
+            "transit":     str,          # 5-digit transit number
             "error":       str | None
         }
 
     Example:
-        >>> validate_ca_routing("000011001")
-        {"valid": True, "bank": "Bank of Montreal (BMO)", "institution": "001", "transit": "00001", "error": None}
+        >>> validate_ca_routing("000110011")
+        {"valid": True, "bank": "Bank of Montreal (BMO)", "institution": "001", "transit": "00011", "error": None}
     """
     routing = _digits_only(routing)
 
-    # Accept 9 digits (paper format: 0TTTTTIII)
-    if len(routing) == 9:
-        if routing[0] != "0":
-            return _response(False, "9-digit Canadian routing must start with 0")
-        routing = routing[1:]  # strip leading zero → 8 digits
+    # Accept 8 digits (TTTTTIII) or 9 digits (0TTTTTIII — paper format)
+    if len(routing) == 9 and routing[0] == "0":
+        routing = routing[1:]  # strip leading zero (paper format)
 
     if len(routing) != 8:
         return _response(False, "Canadian routing number must be 8 digits (TTTTTIII)")
 
-    # Extract components — transit first 5, institution last 3
-    transit     = routing[:5]
-    institution = routing[5:8]
+    # Extract components
+    transit     = routing[:5]   # branch transit number
+    institution = routing[5:8]  # institution number
 
+    # Validate institution number
     bank_name = _INSTITUTIONS.get(institution)
 
     return _response(
@@ -115,8 +119,13 @@ def validate_ca_account(account: str) -> dict:
     """
     Validates a Canadian bank account number format.
 
+    Note:
+        Canadian account numbers vary by bank (7-12 digits).
+        No standardized check digit algorithm exists across all banks.
+        Validation is format-based only.
+
     Args:
-        account: Account number string — 7 to 12 digits
+        account: Account number string — digits only, 7 to 12 digits
 
     Returns:
         dict: {"valid": bool, "error": str | None}
